@@ -5,10 +5,12 @@ import {Asset} from 'expo-media-library';
 
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../../types';
+import AudioComponent from '../components/Audio';
 
 export default function PlaylistScreen({ navigation }: RootTabScreenProps<'Playlist'>) {
   const [audioFiles, setAudioFiles] = useState<Asset[]>([]);
   const [filteredAudioFiles, setFilteredAudioFiles] = useState<Asset[]>([]);
+  const [playing, setPlaying] = useState<Asset>();
 
   const getAudioFiles = async () => {
     let audio = await MediaLibrary.getAssetsAsync({mediaType: 'audio'});
@@ -63,7 +65,12 @@ export default function PlaylistScreen({ navigation }: RootTabScreenProps<'Playl
     <View>
       <ScrollView>
         {filteredAudioFiles.map((audio: Asset, i: number) => {
-          return <Text>{audio.filename.replace('.mp3', '')}</Text>
+          return <AudioComponent key={i}
+                                audio={audio}
+                                isPlaying={audio.id === playing?.id}
+                                setPlaying={setPlaying}
+                                navigation={navigation}
+          />
         })}
       </ScrollView>
     </View>

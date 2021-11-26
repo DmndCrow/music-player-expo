@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Image, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
 import {Audio} from 'expo-av';
 import {Sound} from 'expo-av/build/Audio/Sound';
-import {FontAwesome, Ionicons} from '@expo/vector-icons';
+import {FontAwesome} from '@expo/vector-icons';
 import {Slider} from 'react-native-elements';
 
 import {Text, View} from '../components/Themed';
