@@ -3,18 +3,18 @@ import { StyleSheet, Alert, ScrollView } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import {Asset} from 'expo-media-library';
 import {connect} from 'react-redux';
+
 import {
   get_current_playing_audio, set_current_playing_audio
 } from '../store/audio/action';
-
 import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../../types';
 import AudioComponent from '../components/Audio';
+import MiniPlayerScreen from './miniPlayerScreen';
 
-function PlaylistScreen(props: any, { navigation }: RootTabScreenProps<'Playlist'>) {
+
+function PlaylistScreen(props: any) {
   const [audioFiles, setAudioFiles] = useState<Asset[]>([]);
   const [filteredAudioFiles, setFilteredAudioFiles] = useState<Asset[]>([]);
-  const [playing, setPlaying] = useState<Asset>();
 
   const getAudioFiles = async () => {
     let audio = await MediaLibrary.getAssetsAsync({mediaType: 'audio'});
@@ -65,13 +65,17 @@ function PlaylistScreen(props: any, { navigation }: RootTabScreenProps<'Playlist
     });
   }, []);
 
+  const navigate = (route: any) => {
+    props.navigation.navigate(route);
+  }
+
   return (
     <View>
       <ScrollView>
         {filteredAudioFiles.map((audio: Asset, i: number) => {
           return <AudioComponent key={i}
                                  audio={audio}
-                                 navigation={navigation}
+                                 navigate={navigate}
           />
         })}
       </ScrollView>
@@ -95,5 +99,5 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
-  },
+  }
 });

@@ -4,12 +4,13 @@ import {
   GET_CURRENT_PLAYING_AUDIO,
   SET_CURRENT_PLAYING_AUDIO
 } from './types';
+import {audioState} from '../../models/reduxState';
 
-const initialState = {
+const initialState: audioState = {
   audio: null
 }
 
-const audioReducer = (state = initialState, action: AnyAction) => {
+const audioReducer = (state: audioState = initialState, action: AnyAction) => {
   switch(action.type) {
     case GET_CURRENT_PLAYING_AUDIO: {
       return state.audio;
