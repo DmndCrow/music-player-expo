@@ -2,15 +2,21 @@ import React, {useState, useEffect} from 'react';
 import {Image, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
 import {Audio} from 'expo-av';
 import {Sound} from 'expo-av/build/Audio/Sound';
-import {FontAwesome, Ionicons} from '@expo/vector-icons';
+import {FontAwesome} from '@expo/vector-icons';
 import {Slider} from 'react-native-elements';
+import {connect, useDispatch} from 'react-redux';
+import {
+  get_current_playing_audio, set_current_playing_audio
+} from '../store/audio/action';
 
 import {Text, View} from '../components/Themed';
 import {RootTabScreenProps} from '../../types';
-import {audioBookPlaylist} from '../constants/books';
+import {audioBookPlaylist} from '../utils/constants/books';
 import PlayButtonComponent from '../components/playButton';
+import {rootState} from '../models/reduxState';
+import {ThunkDispatch} from 'redux-thunk';
 
-export default function AudioScreen({navigation}: RootTabScreenProps<'Audio'>) {
+function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackInstance, setPlaybackInstance] = useState<Sound | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -155,6 +161,20 @@ export default function AudioScreen({navigation}: RootTabScreenProps<'Audio'>) {
     </SafeAreaView>
   );
 }
+
+const mapStateToProps = (state: rootState, ownProps: any) => {
+  return {
+    ...ownProps
+  }
+}
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, any>) => {
+  return {
+
+  }
+}
+
+export default connect(mapStateToProps)(PlayerScreen);
 
 
 const styles = StyleSheet.create({
