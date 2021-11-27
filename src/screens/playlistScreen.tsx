@@ -2,12 +2,16 @@ import React, {useState, useEffect} from 'react';
 import { StyleSheet, Alert, ScrollView } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import {Asset} from 'expo-media-library';
+import {connect} from 'react-redux';
+import {
+  get_current_playing_audio, set_current_playing_audio
+} from '../store/audio/action';
 
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import AudioComponent from '../components/Audio';
 
-export default function PlaylistScreen({ navigation }: RootTabScreenProps<'Playlist'>) {
+function PlaylistScreen(props: any, { navigation }: RootTabScreenProps<'Playlist'>) {
   const [audioFiles, setAudioFiles] = useState<Asset[]>([]);
   const [filteredAudioFiles, setFilteredAudioFiles] = useState<Asset[]>([]);
   const [playing, setPlaying] = useState<Asset>();
@@ -66,16 +70,16 @@ export default function PlaylistScreen({ navigation }: RootTabScreenProps<'Playl
       <ScrollView>
         {filteredAudioFiles.map((audio: Asset, i: number) => {
           return <AudioComponent key={i}
-                                audio={audio}
-                                isPlaying={audio.id === playing?.id}
-                                setPlaying={setPlaying}
-                                navigation={navigation}
+                                 audio={audio}
+                                 navigation={navigation}
           />
         })}
       </ScrollView>
     </View>
   );
 }
+
+export default PlaylistScreen;
 
 const styles = StyleSheet.create({
   container: {

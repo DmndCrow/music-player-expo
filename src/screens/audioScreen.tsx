@@ -7,7 +7,7 @@ import {Slider} from 'react-native-elements';
 
 import {Text, View} from '../components/Themed';
 import {RootTabScreenProps} from '../../types';
-import {audioBookPlaylist} from '../constants/books';
+import {audioBookPlaylist} from '../utils/constants/books';
 import PlayButtonComponent from '../components/playButton';
 
 export default function AudioScreen({navigation}: RootTabScreenProps<'Audio'>) {
