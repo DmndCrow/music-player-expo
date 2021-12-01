@@ -3,3 +3,5 @@ interface Status {
   volume: number;
   isBuffering: boolean;
 }
+
+export { Status };
