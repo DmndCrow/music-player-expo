@@ -1,6 +1,6 @@
-import {combineReducers} from 'redux';
-import {audioReducer} from './audio';
-import {playlistReducer} from './playlist';
+import { combineReducers } from 'redux';
+import { audioReducer } from './audio';
+import { playlistReducer } from './playlist';
 
 const rootReducer = combineReducers({
   audioReducer,

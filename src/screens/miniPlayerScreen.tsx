@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import {connect} from 'react-redux';
-import {View, Text} from 'react-native';
+import React from 'react';
+import {
+  View, Text,
+} from 'react-native';
 
 // screen that will be displayed under playlist when:
 // - song is playing
@@ -10,11 +11,7 @@ function MiniPlayerScreen(props: any) {
     <View>
       <Text>My Mini Player</Text>
     </View>
-  )
-}
-
-const mapStateToProps = (state: any) => {
-
+  );
 }
 
 export default MiniPlayerScreen;
