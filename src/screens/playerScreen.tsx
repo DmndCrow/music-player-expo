@@ -1,8 +1,8 @@
 import React, {
-  useState, useEffect,
+  useState, useEffect
 } from 'react';
 import {
-  Image, StyleSheet, TouchableOpacity, SafeAreaView,
+  Image, StyleSheet, TouchableOpacity, SafeAreaView
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio/Sound';
@@ -13,39 +13,39 @@ import { ThunkDispatch } from 'redux-thunk';
 
 import { Asset } from 'expo-media-library';
 import {
-  setCurrentPlayingAudio,
+  setCurrentPlayingAudio
 } from '../store/audio/action';
 import {
-  Text, View,
+  Text, View
 } from '../components/Themed';
 import PlayButtonComponent from '../components/playButton';
 import { rootState } from '../models/reduxState';
 import {
-  getAssetTitle, getDurationAsString,
+  getAssetTitle, getDurationAsString
 } from '../utils/functions';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EAEAEC',
+    backgroundColor: '#EAEAEC'
   },
   textLight: {
-    color: '#B6B7BF',
+    color: '#B6B7BF'
   },
   text: {
-    color: '#8E97A6',
+    color: '#8E97A6'
   },
   titleContainer: {
-    alignItems: 'center', marginTop: 24,
+    alignItems: 'center', marginTop: 24
   },
   textDark: {
-    color: '#3D425C',
+    color: '#3D425C'
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 0,
+    marginTop: 0
   },
   coverContainer: {
     marginTop: 32,
@@ -54,36 +54,36 @@ const styles = StyleSheet.create({
     shadowColor: '#5D3F6A',
     // shadowOffset: { height: 15 },
     shadowRadius: 8,
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.3
   },
   cover: {
     width: 250,
     height: 250,
-    borderRadius: 125,
+    borderRadius: 125
   },
   track: {
     height: 2,
     borderRadius: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF'
   },
   thumb: {
     width: 8,
     height: 8,
-    backgroundColor: '#3D425C',
+    backgroundColor: '#3D425C'
   },
   timeStamp: {
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '500'
   },
   seekbar: { margin: 32 },
   inProgress: {
     marginTop: -12,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   trackName: {
-    alignItems: 'center', marginTop: 32,
-  },
+    alignItems: 'center', marginTop: 32
+  }
 });
 
 function PlayerScreen(props: any) {
@@ -100,13 +100,14 @@ function PlayerScreen(props: any) {
   const loadAudio = async () => {
     try {
       const newPlaybackInstance = new Audio.Sound();
+
       const source = {
-        uri: props.audio.uri,
+        uri: props.audio.uri
       };
 
       const status = {
         shouldPlay: isPlaying,
-        volume,
+        volume
       };
 
       newPlaybackInstance.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
@@ -125,7 +126,7 @@ function PlayerScreen(props: any) {
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
       shouldDuckAndroid: true,
       staysActiveInBackground: true,
-      playThroughEarpieceAndroid: true,
+      playThroughEarpieceAndroid: true
     });
 
     await loadAudio();
@@ -133,7 +134,6 @@ function PlayerScreen(props: any) {
 
   useEffect(() => {
     if (props.index > -1) {
-      console.log(props.index);
       initAudio();
     }
   }, [props.index]);
@@ -151,7 +151,7 @@ function PlayerScreen(props: any) {
     } else if (props.index > 0) {
       newIndex -= 1;
     }
-    props.changeSong(props.playlist[newIndex].audio, newIndex);
+    props.changeSong(props.playlist[newIndex], newIndex);
   };
 
   const handleNextTrack = async () => {
@@ -163,7 +163,7 @@ function PlayerScreen(props: any) {
     } else if (props.index > 0) {
       newIndex += 1;
     }
-    props.changeSong(props.playlist[newIndex].audio, newIndex);
+    props.changeSong(props.playlist[newIndex], newIndex);
   };
 
   return (
@@ -182,7 +182,7 @@ function PlayerScreen(props: any) {
         </View>
         <View style={styles.trackName}>
           <Text style={[styles.textDark, {
-            fontSize: 20, fontWeight: '500',
+            fontSize: 20, fontWeight: '500'
           }]}
           >
             {getAssetTitle(props.audio)}
@@ -196,7 +196,7 @@ function PlayerScreen(props: any) {
           trackStyle={styles.track}
           thumbStyle={styles.thumb}
           value={0}
-          minimumTrackTintColor="#93A8B3"
+          minimumTrackTintColor='#93A8B3'
           // onValueChange={(seconds) => changeTime(seconds)}
           onSlidingComplete={handleNextTrack}
         />
@@ -212,15 +212,15 @@ function PlayerScreen(props: any) {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handlePreviousTrack}>
-          <FontAwesome name="backward" size={32} color="#93A8B3" />
+          <FontAwesome name='backward' size={32} color='#93A8B3' />
         </TouchableOpacity>
         {!isPlaying ? (
-          <PlayButtonComponent onPress={() => handlePlayPause()} state="play" />
+          <PlayButtonComponent onPress={() => handlePlayPause()} state='play' />
         ) : (
-          <PlayButtonComponent onPress={() => handlePlayPause()} state="pause" />
+          <PlayButtonComponent onPress={() => handlePlayPause()} state='pause' />
         )}
         <TouchableOpacity onPress={handleNextTrack}>
-          <FontAwesome name="forward" size={32} color="#93A8B3" />
+          <FontAwesome name='forward' size={32} color='#93A8B3' />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -231,11 +231,11 @@ const mapStateToProps = (state: rootState, ownProps: any) => ({
   ...ownProps,
   playlist: state.playlistReducer.playlist,
   audio: state.audioReducer.audio,
-  index: state.audioReducer.index,
+  index: state.audioReducer.index
 });
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, any>) => ({
-  changeSong: (audio: Asset | null, index: number) => dispatch(setCurrentPlayingAudio(audio, index)),
+  changeSong: (audio: Asset | null, index: number) => dispatch(setCurrentPlayingAudio(audio, index))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlayerScreen);

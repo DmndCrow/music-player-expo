@@ -80,14 +80,22 @@ function PlaylistScreen(props: any) {
       permissionAlert();
     }
 
-    return files.filter((file) => file.filename.endsWith('.mp3'));
+    return filterFiles(files);
   };
+
+  const filterFiles = (files: Asset[]) => {
+    return files.filter((file) => {
+      let mp3 = file.filename.endsWith('.mp3');
+      let duration = file.duration > 10;
+      return mp3 && duration;
+    });
+  }
 
   useEffect(() => {
     getPermission().then((files) => {
-      setAudioFiles(files);
-      props.updatePlaylist(files);
-      setFilteredAudioFiles(files);
+      setAudioFiles(filterFiles(files));
+      props.updatePlaylist(filterFiles(files));
+      setFilteredAudioFiles(filterFiles(files));
     });
   }, []);
 
