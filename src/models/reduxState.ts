@@ -1,4 +1,4 @@
-import {Asset} from 'expo-media-library';
+import { Asset } from 'expo-media-library';
 
 interface audioState {
   audio: Asset | null;
@@ -10,5 +10,5 @@ interface rootState {
 
 export {
   audioState,
-  rootState
-}
+  rootState,
+};

@@ -1,14 +1,8 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import {FontAwesome} from '@expo/vector-icons';
-
-export default function PlayButtonComponent(props: any) {
-  return (
-    <TouchableOpacity style={styles.playButtonContainer} onPress={props.onPress}>
-      <FontAwesome name={props.state} size={32} color="#3D425C" />
-    </TouchableOpacity>
-);
-}
+import {
+  StyleSheet, TouchableOpacity,
+} from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
   playButtonContainer: {
@@ -26,3 +20,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
   },
 });
+
+export default function PlayButtonComponent(props: any) {
+  return (
+    <TouchableOpacity
+      style={styles.playButtonContainer}
+      onPress={props.onPress}
+    >
+      <FontAwesome name={props.state} size={32} color="#3D425C" />
+    </TouchableOpacity>
+  );
+}

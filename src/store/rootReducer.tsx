@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { audioReducer } from './audio';
 
 const rootReducer = combineReducers({
-  audioReducer
+  audioReducer,
 });
 
 export default rootReducer;

@@ -1,0 +1,43 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "@typescript-eslint"],
+  "rules": {
+    "semi": ["error", "always"], // semicolon is required
+    "curly": 1, // curly brackets warning
+    "quotes": ["error", "single"], // always use single quotes
+    "quote-props": ["error", "as-needed"], // object key initialization is not required to use quotes
+    "comma-dangle": "error", // no trailing comma
+    "comma-spacing": "error", // space after comma between elements is required
+    "indent": ["error", 2], // indent is required to be 2
+    "spaced-comment": "error", // whitespace at the beginning of comment is required
+    "no-plusplus": "error", // no i++, only i += 1
+    "react/jsx-uses-react": "error",
+    "no-unused-vars": ["error", { "args": "none" }], // disallow unused vars except arguments
+    "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }], // disallow expressions that has no meaning
+    "object-curly-newline": ["error", { "minProperties": 2, "consistent": true }], // curly bracketns on new line
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "react/jsx-filename-extension": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "react/function-component-definition": 0,
+    "react/no-unstable-nested-components": ["error", { "allowAsProps": true }],
+    "react/jsx-props-no-spreading": 1,
+    "import/prefer-default-export": 1,
+    "react/destructuring-assignment": 1,
+    "no-console": 0,
+    "global-require": 0,
+    "default-param-last": 1
+  }
+}
