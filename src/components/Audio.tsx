@@ -1,19 +1,23 @@
-import React, {useState, useEffect} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
-import { useDispatch, connect } from 'react-redux';
+import React, {
+  useState, useEffect,
+, Dispatch } from 'react';
 import {
-  get_current_playing_audio, set_current_playing_audio
-} from '../store/audio/action';
+View, TouchableOpacity, StyleSheet
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import {
+ useDispatch, connect 
+} from 'react-redux';
 
 
 import {Text} from './Themed';
 import {Asset} from 'expo-media-library';
-import { Dispatch } from 'react';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {rootState} from '../models/reduxState';
-
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
+import {
+  get_current_playing_audio, set_current_playing_audio,
+} from '../store/audio/action';
+import { rootState } from '../models/reduxState';
 
 function AudioComponent(props: any) {
   const dispatch = useDispatch();
@@ -32,22 +36,22 @@ function AudioComponent(props: any) {
   const handleSongAction = () => {
     if (!props.isPlaying) {
       props.playSong(props.audio);
-      props.navigate('Player')
+      props.navigate('Player');
     } else {
       props.playSong(null);
     }
-  }
+  };
 
   const getAudioName = () => {
-    let filename = props.audio.filename.replace('.mp3', '');
+    const filename = props.audio.filename.replace('.mp3', '');
     filename.trim();
 
     return filename;
-  }
+  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={handleSongAction}>
-      <Ionicons name={iconName} size={size} color={color}/>
+      <Ionicons name={iconName} size={size} color={color} />
       <View>
         <Text style={styles.name} numberOfLines={1}>
           {getAudioName()}
@@ -57,21 +61,17 @@ function AudioComponent(props: any) {
         </Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => {
-  return {
-    playSong: (audio: Asset | null) => dispatch(set_current_playing_audio(audio)),
-  }
-}
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => ({
+  playSong: (audio: Asset | null) => dispatch(set_current_playing_audio(audio)),
+});
 
-const mapStateToProps = (state: rootState, ownProps: any) => {
-  return {
-    ...ownProps,
-    isPlaying: state.audioReducer.audio?.id === ownProps.audio.id,
-  }
-}
+const mapStateToProps = (state: rootState, ownProps: any) => ({
+  ...ownProps,
+  isPlaying: state.audioReducer.audio?.id === ownProps.audio.id,
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioComponent);
 
@@ -83,10 +83,10 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    color: 'black'
+    color: 'black',
   },
   duration: {
     fontSize: 8,
-    color: 'black'
-  }
+    color: 'black',
+  },
 });
