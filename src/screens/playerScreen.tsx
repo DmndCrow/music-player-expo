@@ -4,38 +4,33 @@ import {Audio} from 'expo-av';
 import {Sound} from 'expo-av/build/Audio/Sound';
 import {FontAwesome} from '@expo/vector-icons';
 import {Slider} from 'react-native-elements';
-import {connect, useDispatch} from 'react-redux';
-import {
-  get_current_playing_audio, set_current_playing_audio
-} from '../store/audio/action';
-
-import {Text, View} from '../components/Themed';
-import {RootTabScreenProps} from '../../types';
-import {audioBookPlaylist} from '../utils/constants/books';
-import PlayButtonComponent from '../components/playButton';
-import {rootState} from '../models/reduxState';
+import {connect} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
-function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
+import {
+  set_current_playing_audio,
+} from '../store/audio/action';
+import {Text, View} from '../components/Themed';
+import {RootTabScreenProps} from '../../types';
+import PlayButtonComponent from '../components/playButton';
+import {rootState} from '../models/reduxState';
+import {get_duration_as_string, get_asset_title } from '../utils/functions';
+import { Asset } from 'expo-media-library';
+
+function PlayerScreen(props: any) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackInstance, setPlaybackInstance] = useState<Sound | null>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [volume, setVolume] = useState<number>(1.0);
   const [isBuffering, setIsBuffering] = useState<boolean>(true);
+  const [timeElapsed, setTimeElapsed] = useState<number>(0);
+
 
   useEffect(() => {
-    try {
-      console.log(`index is ${currentIndex}`);
-      initAudio();
-
-    } catch (e) {
-      console.log(e);
+    if (props.index > -1) {
+      console.log(props.index);
+      loadAudio();
     }
-  }, []);
-
-  useEffect(() => {
-    loadAudio();
-  }, [currentIndex]);
+  }, [props.index]);
 
   const initAudio = async () => {
     await Audio.setAudioModeAsync({
@@ -55,7 +50,7 @@ function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
     try {
       const newPlaybackInstance = new Audio.Sound();
       const source = {
-        uri: audioBookPlaylist[currentIndex].uri,
+        uri: props.audio.uri,
       };
 
       const status = {
@@ -81,26 +76,26 @@ function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
   };
 
   const handlePreviousTrack = async () => {
-    let newIndex = currentIndex;
+    let newIndex = props.index;
     await playbackInstance?.unloadAsync();
-    if (currentIndex == 0) {
-      newIndex = audioBookPlaylist.length - 1;
-    } else {
+    if (props.index == 0) {
+      newIndex = props.playlist.length - 1;
+    } else if (props.index > 0) {
       newIndex -= 1;
     }
-    setCurrentIndex(newIndex);
+    props.changeSong(props.playlist[newIndex].audio, newIndex);
   };
 
   const handleNextTrack = async () => {
-    let newIndex = currentIndex;
+    let newIndex = props.index;
     await playbackInstance?.unloadAsync();
 
-    if (currentIndex == audioBookPlaylist.length - 1) {
+    if (props.index == props.playlist.length - 1) {
       newIndex = 0;
-    } else {
+    } else if (props.index > 0){
       newIndex += 1;
     }
-    setCurrentIndex(newIndex);
+    props.changeSong(props.playlist[newIndex].audio, newIndex);
   };
 
   return (
@@ -118,7 +113,7 @@ function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
         </View>
         <View style={styles.trackName}>
           <Text style={[styles.textDark, {fontSize: 20, fontWeight: '500'}]}>
-            {audioBookPlaylist[currentIndex].title}
+            {get_asset_title(props.audio)}
           </Text>
         </View>
       </View>
@@ -128,19 +123,17 @@ function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
           maximumValue={100}
           trackStyle={styles.track}
           thumbStyle={styles.thumb}
-          value={100}
+          value={0}
           minimumTrackTintColor="#93A8B3"
           // onValueChange={(seconds) => changeTime(seconds)}
           onSlidingComplete={handleNextTrack}
         />
         <View style={styles.inProgress}>
           <Text style={[styles.textLight, styles.timeStamp]}>
-            {/*{convertSecondsToString(timeElapsed)}*/}
-            01:02
+            {get_duration_as_string(timeElapsed)}
           </Text>
           <Text style={[styles.textLight, styles.timeStamp]}>
-            {/*{convertSecondsToString(song?.duration)}*/}
-            03:43
+            {get_duration_as_string(props.audio?.duration)}
           </Text>
         </View>
       </View>
@@ -164,17 +157,20 @@ function PlayerScreen({navigation}: RootTabScreenProps<'Player'>) {
 
 const mapStateToProps = (state: rootState, ownProps: any) => {
   return {
-    ...ownProps
-  }
-}
+    ...ownProps,
+    playlist: state.playlistReducer.playlist,
+    audio: state.audioReducer.audio,
+    index: state.audioReducer.index
+  };
+};
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, any>) => {
   return {
+    changeSong: (audio: Asset | null, index: number) => dispatch(set_current_playing_audio(audio, index)),
+  };
+};
 
-  }
-}
-
-export default connect(mapStateToProps)(PlayerScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(PlayerScreen);
 
 
 const styles = StyleSheet.create({

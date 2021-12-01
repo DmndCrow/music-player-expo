@@ -1,18 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
-import { useDispatch, connect } from 'react-redux';
-import {
-  get_current_playing_audio, set_current_playing_audio
-} from '../store/audio/action';
-
+import {useDispatch, connect} from 'react-redux';
 
 import {Text} from './Themed';
 import {Asset} from 'expo-media-library';
-import { Dispatch } from 'react';
+import {Dispatch} from 'react';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {rootState} from '../models/reduxState';
+import {
+  get_asset_title, get_duration_as_string,
+} from '../utils/functions';
+import {
+  set_current_playing_audio
+} from '../store/audio/action';
 
 
 function AudioComponent(props: any) {
@@ -31,47 +33,40 @@ function AudioComponent(props: any) {
 
   const handleSongAction = () => {
     if (!props.isPlaying) {
-      props.playSong(props.audio);
-      props.navigate('Player')
+      props.playSong(props.audio, props.index);
+      props.navigate('Player');
     } else {
-      props.playSong(null);
+      props.playSong(null, -1);
     }
-  }
-
-  const getAudioName = () => {
-    let filename = props.audio.filename.replace('.mp3', '');
-    filename.trim();
-
-    return filename;
-  }
+  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={handleSongAction}>
       <Ionicons name={iconName} size={size} color={color}/>
       <View>
         <Text style={styles.name} numberOfLines={1}>
-          {getAudioName()}
+          {get_asset_title(props.audio)}
         </Text>
         <Text style={styles.duration} numberOfLines={1}>
-          {props.audio.duration}
+          {get_duration_as_string(props.audio.duration)}
         </Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => {
   return {
-    playSong: (audio: Asset | null) => dispatch(set_current_playing_audio(audio)),
-  }
-}
+    playSong: (audio: Asset | null, index: number) => dispatch(set_current_playing_audio(audio, index)),
+  };
+};
 
 const mapStateToProps = (state: rootState, ownProps: any) => {
   return {
     ...ownProps,
     isPlaying: state.audioReducer.audio?.id === ownProps.audio.id,
-  }
-}
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioComponent);
 
@@ -83,10 +78,10 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    color: 'black'
+    color: 'black',
   },
   duration: {
     fontSize: 8,
-    color: 'black'
-  }
+    color: 'black',
+  },
 });
