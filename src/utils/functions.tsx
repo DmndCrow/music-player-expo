@@ -12,7 +12,7 @@ const getAssetTitle = (asset: Asset | null) => {
 
 const getDurationAsString = (duration: number) => {
   if (duration) {
-    return new Date(duration * 1000).toISOString().substr(14, 5);
+    return new Date(duration).toISOString().substr(14, 5);
   }
   return '00:00';
 };

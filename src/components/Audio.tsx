@@ -64,7 +64,7 @@ function AudioComponent(props: any) {
           {getAssetTitle(props.audio)}
         </Text>
         <Text style={styles.duration} numberOfLines={1}>
-          {getDurationAsString(props.audio.duration)}
+          {getDurationAsString(props.audio.duration * 1000)}
         </Text>
       </View>
     </TouchableOpacity>

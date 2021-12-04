@@ -83,13 +83,11 @@ function PlaylistScreen(props: any) {
     return filterFiles(files);
   };
 
-  const filterFiles = (files: Asset[]) => {
-    return files.filter((file) => {
-      let mp3 = file.filename.endsWith('.mp3');
-      let duration = file.duration > 10;
-      return mp3 && duration;
-    });
-  }
+  const filterFiles = (files: Asset[]) => files.filter((file) => {
+    const mp3 = file.filename.endsWith('.mp3');
+    const duration = file.duration > 10;
+    return mp3 && duration;
+  });
 
   useEffect(() => {
     getPermission().then((files) => {
