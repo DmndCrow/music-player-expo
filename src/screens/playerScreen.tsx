@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
 
 function PlayerScreen(props: any) {
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
-  const [percentage, setPercentage] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackInstance, setPlaybackInstance] = useState<Sound | null>(null);
@@ -106,9 +105,7 @@ function PlayerScreen(props: any) {
     } else {
       if (playbackStatus.isPlaying) {
         const position = playbackStatus.positionMillis ?? 0;
-        const duration = playbackStatus.durationMillis ?? 0.1;
         setTimeElapsed(position);
-        setPercentage(Math.floor(position / duration * 100));
       } else {
         setIsPlaying(false);
       }
@@ -162,10 +159,7 @@ function PlayerScreen(props: any) {
 
   useEffect(() => {
     if (props.index > -1) {
-      console.log('efffect new index', props.index);
       setDuration(props.audio.duration * 1000);
-      setTimeElapsed(0);
-      setPercentage(0);
       if (!audioLoaded){
         initAudio();
       } else {
@@ -240,12 +234,12 @@ function PlayerScreen(props: any) {
       <View style={styles.seekbar}>
         <Slider
           minimumValue={0}
-          maximumValue={100}
+          maximumValue={duration}
           trackStyle={styles.track}
           thumbStyle={styles.thumb}
-          value={percentage}
+          value={timeElapsed}
           minimumTrackTintColor="#93A8B3"
-          onValueChange={(newPercentage) => updateTimeElapsed(newPercentage)}
+          // onValueChange={(newPercentage) => updateTimeElapsed(newPercentage)}
           onSlidingComplete={handleNextTrack}
         />
         <View style={styles.inProgress}>
@@ -260,11 +254,11 @@ function PlayerScreen(props: any) {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handlePreviousTrack}>
-          <FontAwesome name="backward" size={32} color="#93A8B3" />
+          <FontAwesome name="arrow-left" size={32} color="#93A8B3" />
         </TouchableOpacity>
         <PlayButtonComponent onPress={() => handlePlayPause()} state={isPlaying ? 'pause' : 'play'} />
         <TouchableOpacity onPress={handleNextTrack}>
-          <FontAwesome name="forward" size={32} color="#93A8B3" />
+          <FontAwesome name="arrow-right" size={32} color="#93A8B3" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
