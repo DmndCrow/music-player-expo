@@ -1,8 +1,6 @@
-import React, {
-  useState, useEffect,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Image, StyleSheet, TouchableOpacity, SafeAreaView,
+  Image, SafeAreaView, StyleSheet, TouchableOpacity,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio/Sound';
@@ -12,17 +10,11 @@ import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 
 import { Asset } from 'expo-media-library';
-import {
-  setCurrentPlayingAudio,
-} from '../store/audio/action';
-import {
-  Text, View,
-} from '../components/Themed';
+import { setCurrentPlayingAudio } from '../store/audio/action';
+import { Text, View } from '../components/Themed';
 import PlayButtonComponent from '../components/playButton';
 import { rootState } from '../models/reduxState';
-import {
-  getAssetTitle, getDurationAsString,
-} from '../utils/functions';
+import { getAssetTitle, getDurationAsString } from '../utils/functions';
 import { AVPlaybackStatus } from '../models/audioStatus';
 
 const styles = StyleSheet.create({
@@ -95,6 +87,35 @@ function PlayerScreen(props: any) {
   const [volume] = useState<number>(1.0);
   const [audioLoaded, setAudioLoaded] = useState<boolean>(false);
 
+  const getStatus = async () => {
+    const status = await playbackInstance?.getStatusAsync();
+    return status;
+  };
+
+  const playNewAudio = async (newIndex: number) => {
+    await props.changeSong(props.playlist[newIndex], newIndex);
+  };
+
+  const handlePreviousTrack = async () => {
+    let newIndex = props.index;
+    if (props.index === 0) {
+      newIndex = props.playlist.length - 1;
+    } else if (props.index > 0) {
+      newIndex -= 1;
+    }
+    await playNewAudio(newIndex);
+  };
+
+  const handleNextTrack = async () => {
+    let newIndex = props.index;
+    if (props.index === props.playlist.length - 1) {
+      newIndex = 0;
+    } else if (props.index >= 0) {
+      newIndex += 1;
+    }
+    await playNewAudio(newIndex);
+  };
+
   const onPlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
     if (!playbackStatus.isLoaded) {
       // Update your UI for the unloaded state
@@ -117,16 +138,17 @@ function PlayerScreen(props: any) {
       if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
         handleNextTrack();
       }
-
     }
   };
 
   const loadAudio = async () => {
     try {
+      await playbackInstance?.unloadAsync();
       const newPlaybackInstance = new Audio.Sound();
 
+      // TODO: fix error for '85%' audio file not playing
       const source = {
-        uri: props.audio.uri
+        uri: props.audio.uri,
       };
 
       const status: AVPlaybackStatus = {
@@ -160,7 +182,7 @@ function PlayerScreen(props: any) {
   useEffect(() => {
     if (props.index > -1) {
       setDuration(props.audio.duration * 1000);
-      if (!audioLoaded){
+      if (!audioLoaded) {
         initAudio();
       } else {
         loadAudio();
@@ -173,41 +195,12 @@ function PlayerScreen(props: any) {
     setIsPlaying(!isPlaying);
   };
 
-  const playNewAudio = async (newIndex: number) => {
-    await props.changeSong(props.playlist[newIndex], newIndex);
-  }
+  const updateTimeElapsed = async (newPercentage: number) => {
+    const audioDuration = props.audio.duration * 1000;
+    const newTimeElapsed = newPercentage * audioDuration;
 
-  const handlePreviousTrack = async () => {
-    let newIndex = props.index;
-    await playbackInstance?.unloadAsync();
-    if (props.index === 0) {
-      newIndex = props.playlist.length - 1;
-    } else if (props.index > 0) {
-      newIndex -= 1;
-    }
-    await playNewAudio(newIndex);
+    await playbackInstance?.setPositionAsync(newTimeElapsed);
   };
-
-  const handleNextTrack = async () => {
-    let newIndex = props.index;
-    await playbackInstance?.unloadAsync();
-
-    if (props.index === props.playlist.length - 1) {
-      newIndex = 0;
-    } else if (props.index >= 0) {
-      newIndex += 1;
-    }
-    await playNewAudio(newIndex);
-  };
-
-  // TODO: fix slider move
-  // TODO: stop current audio, when new one is played
-  const updateTimeElapsed = (newPercentage: number) => {
-    const newTimeElapsed = newPercentage * props.audio.duration * 10;
-    playbackInstance?.setPositionAsync(newTimeElapsed);
-    setPlaybackInstance(playbackInstance);
-    console.log(duration, newPercentage, newTimeElapsed);
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -239,8 +232,7 @@ function PlayerScreen(props: any) {
           thumbStyle={styles.thumb}
           value={timeElapsed}
           minimumTrackTintColor="#93A8B3"
-          // onValueChange={(newPercentage) => updateTimeElapsed(newPercentage)}
-          onSlidingComplete={handleNextTrack}
+          onValueChange={(newPercentage) => updateTimeElapsed(newPercentage)}
         />
         <View style={styles.inProgress}>
           <Text style={[styles.textLight, styles.timeStamp]}>
