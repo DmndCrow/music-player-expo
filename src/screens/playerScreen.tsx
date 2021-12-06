@@ -195,9 +195,12 @@ function PlayerScreen(props: any) {
     setIsPlaying(!isPlaying);
   };
 
+  // TODO: find out why playbackinstance is null
   const updateTimeElapsed = async (newPercentage: number) => {
     const audioDuration = props.audio.duration * 1000;
     const newTimeElapsed = newPercentage * audioDuration;
+    console.log(playbackInstance);
+    console.log(await getStatus());
 
     await playbackInstance?.setPositionAsync(newTimeElapsed);
   };
@@ -232,7 +235,7 @@ function PlayerScreen(props: any) {
           thumbStyle={styles.thumb}
           value={timeElapsed}
           minimumTrackTintColor="#93A8B3"
-          onValueChange={(newPercentage) => updateTimeElapsed(newPercentage)}
+          onValueChange={updateTimeElapsed}
         />
         <View style={styles.inProgress}>
           <Text style={[styles.textLight, styles.timeStamp]}>
