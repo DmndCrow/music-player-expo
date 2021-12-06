@@ -1,25 +1,21 @@
-import React, {
-  useState, useEffect,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Image, StyleSheet, TouchableOpacity, SafeAreaView,
+  Image, SafeAreaView, StyleSheet, TouchableOpacity,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio/Sound';
 import { FontAwesome } from '@expo/vector-icons';
 import { Slider } from 'react-native-elements';
-import {
-  connect,
-} from 'react-redux';
+import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 
-import {
-  Text, View,
-} from '../components/Themed';
-import { RootTabScreenProps } from '../../types';
-import { audioBookPlaylist } from '../utils/constants/books';
+import { Asset } from 'expo-media-library';
+import { setCurrentPlayingAudio } from '../store/audio/action';
+import { Text, View } from '../components/Themed';
 import PlayButtonComponent from '../components/playButton';
 import { rootState } from '../models/reduxState';
+import { getAssetTitle, getDurationAsString } from '../utils/functions';
+import { AVPlaybackStatus } from '../models/audioStatus';
 
 const styles = StyleSheet.create({
   container: {
@@ -83,32 +79,87 @@ const styles = StyleSheet.create({
   },
 });
 
-function PlayerScreen({ navigation }: RootTabScreenProps<'Player'>) {
+function PlayerScreen(props: any) {
+  const [timeElapsed, setTimeElapsed] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackInstance, setPlaybackInstance] = useState<Sound | null>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [volume] = useState<number>(1.0);
-  const [, setIsBuffering] = useState<boolean>(true);
+  const [audioLoaded, setAudioLoaded] = useState<boolean>(false);
 
-  const onPlaybackStatusUpdate = (status: any) => {
-    setIsBuffering(status.isBuffering);
+  const getStatus = async () => {
+    const status = await playbackInstance?.getStatusAsync();
+    return status;
+  };
+
+  const playNewAudio = async (newIndex: number) => {
+    await props.changeSong(props.playlist[newIndex], newIndex);
+  };
+
+  const handlePreviousTrack = async () => {
+    let newIndex = props.index;
+    if (props.index === 0) {
+      newIndex = props.playlist.length - 1;
+    } else if (props.index > 0) {
+      newIndex -= 1;
+    }
+    await playNewAudio(newIndex);
+  };
+
+  const handleNextTrack = async () => {
+    let newIndex = props.index;
+    if (props.index === props.playlist.length - 1) {
+      newIndex = 0;
+    } else if (props.index >= 0) {
+      newIndex += 1;
+    }
+    await playNewAudio(newIndex);
+  };
+
+  const onPlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
+    if (!playbackStatus.isLoaded) {
+      // Update your UI for the unloaded state
+      if (playbackStatus.error) {
+        console.log(`Encountered a fatal error during playback: ${playbackStatus.error}`);
+        // Send Expo team the error on Slack or the forums so we can help you debug!
+      }
+    } else {
+      if (playbackStatus.isPlaying) {
+        const position = playbackStatus.positionMillis ?? 0;
+        setTimeElapsed(position);
+      } else {
+        setIsPlaying(false);
+      }
+
+      if (playbackStatus.isBuffering) {
+        // Update your UI for the buffering state
+      }
+
+      if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+        handleNextTrack();
+      }
+    }
   };
 
   const loadAudio = async () => {
     try {
+      await playbackInstance?.unloadAsync();
       const newPlaybackInstance = new Audio.Sound();
+
+      // TODO: fix error for '85%' audio file not playing
       const source = {
-        uri: audioBookPlaylist[currentIndex].uri,
+        uri: props.audio.uri,
       };
 
-      const status = {
-        shouldPlay: isPlaying,
+      const status: AVPlaybackStatus = {
+        shouldPlay: true,
         volume,
       };
 
       newPlaybackInstance.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
       await newPlaybackInstance.loadAsync(source, status, false);
       setPlaybackInstance(newPlaybackInstance);
+      setIsPlaying(true);
     } catch (e) {
       console.log(e);
     }
@@ -124,53 +175,37 @@ function PlayerScreen({ navigation }: RootTabScreenProps<'Player'>) {
       staysActiveInBackground: true,
       playThroughEarpieceAndroid: true,
     });
-
+    setAudioLoaded(true);
     await loadAudio();
   };
 
   useEffect(() => {
-    try {
-      console.log(`index is ${currentIndex}`);
-      initAudio();
-    } catch (e) {
-      console.log(e);
+    if (props.index > -1) {
+      setDuration(props.audio.duration * 1000);
+      if (!audioLoaded) {
+        initAudio();
+      } else {
+        loadAudio();
+      }
     }
-  }, []);
-
-  useEffect(() => {
-    loadAudio();
-  }, [currentIndex]);
+  }, [props.index]);
 
   const handlePlayPause = async () => {
     isPlaying ? await playbackInstance?.pauseAsync() : await playbackInstance?.playAsync();
     setIsPlaying(!isPlaying);
   };
 
-  const handlePreviousTrack = async () => {
-    let newIndex = currentIndex;
-    await playbackInstance?.unloadAsync();
-    if (currentIndex === 0) {
-      newIndex = audioBookPlaylist.length - 1;
-    } else {
-      newIndex -= 1;
-    }
-    setCurrentIndex(newIndex);
-  };
+  // TODO: find out why playbackinstance is null
+  const updateTimeElapsed = async (newPercentage: number) => {
+    const audioDuration = props.audio.duration * 1000;
+    const newTimeElapsed = newPercentage * audioDuration;
+    console.log(playbackInstance);
+    console.log(await getStatus());
 
-  const handleNextTrack = async () => {
-    let newIndex = currentIndex;
-    await playbackInstance?.unloadAsync();
-
-    if (currentIndex === audioBookPlaylist.length - 1) {
-      newIndex = 0;
-    } else {
-      newIndex += 1;
-    }
-    setCurrentIndex(newIndex);
+    await playbackInstance?.setPositionAsync(newTimeElapsed);
   };
 
   return (
-
     <SafeAreaView style={styles.container}>
       <View style={{ alignItems: 'center' }}>
         <View style={styles.titleContainer}>
@@ -188,44 +223,37 @@ function PlayerScreen({ navigation }: RootTabScreenProps<'Player'>) {
             fontSize: 20, fontWeight: '500',
           }]}
           >
-            {audioBookPlaylist[currentIndex].title}
+            {getAssetTitle(props.audio)}
           </Text>
         </View>
       </View>
       <View style={styles.seekbar}>
         <Slider
           minimumValue={0}
-          maximumValue={100}
+          maximumValue={duration}
           trackStyle={styles.track}
           thumbStyle={styles.thumb}
-          value={100}
+          value={timeElapsed}
           minimumTrackTintColor="#93A8B3"
-          // onValueChange={(seconds) => changeTime(seconds)}
-          onSlidingComplete={handleNextTrack}
+          onValueChange={updateTimeElapsed}
         />
         <View style={styles.inProgress}>
           <Text style={[styles.textLight, styles.timeStamp]}>
-            {/* {convertSecondsToString(timeElapsed)} */}
-            01:02
+            {getDurationAsString(timeElapsed)}
           </Text>
           <Text style={[styles.textLight, styles.timeStamp]}>
-            {/* {convertSecondsToString(song?.duration)} */}
-            03:43
+            {getDurationAsString(duration)}
           </Text>
         </View>
       </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handlePreviousTrack}>
-          <FontAwesome name="backward" size={32} color="#93A8B3" />
+          <FontAwesome name="arrow-left" size={32} color="#93A8B3" />
         </TouchableOpacity>
-        {!isPlaying ? (
-          <PlayButtonComponent onPress={() => handlePlayPause()} state="play" />
-        ) : (
-          <PlayButtonComponent onPress={() => handlePlayPause()} state="pause" />
-        )}
+        <PlayButtonComponent onPress={() => handlePlayPause()} state={isPlaying ? 'pause' : 'play'} />
         <TouchableOpacity onPress={handleNextTrack}>
-          <FontAwesome name="forward" size={32} color="#93A8B3" />
+          <FontAwesome name="arrow-right" size={32} color="#93A8B3" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -234,10 +262,13 @@ function PlayerScreen({ navigation }: RootTabScreenProps<'Player'>) {
 
 const mapStateToProps = (state: rootState, ownProps: any) => ({
   ...ownProps,
+  playlist: state.playlistReducer.playlist,
+  audio: state.audioReducer.audio,
+  index: state.audioReducer.index,
 });
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, any>) => ({
-
+  changeSong: (audio: Asset | null, index: number) => dispatch(setCurrentPlayingAudio(audio, index)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlayerScreen);

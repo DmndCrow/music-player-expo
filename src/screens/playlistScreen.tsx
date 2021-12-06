@@ -2,16 +2,19 @@ import React, {
   useState, useEffect,
 } from 'react';
 import {
-  StyleSheet, Alert, ScrollView,
+  Alert, ScrollView,
 } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { Asset } from 'expo-media-library';
 import { connect } from 'react-redux';
 
+import { ThunkDispatch } from 'redux-thunk';
+
 import {
   View,
 } from '../components/Themed';
 import AudioComponent from '../components/Audio';
+import { setPlaylist } from '../store/playlist/action';
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -43,6 +46,18 @@ function PlaylistScreen(props: any) {
     return audio.assets;
   };
 
+  const permissionAlert = () => {
+    Alert.alert('Permission required', 'Application needs to read audio files', [
+      {
+        text: 'Allow',
+        onPress: () => getPermission(),
+      }, {
+        text: 'Deny',
+        onPress: () => permissionAlert(),
+      },
+    ]);
+  };
+
   const getPermission = async () => {
     const permission = await MediaLibrary.getPermissionsAsync();
 
@@ -65,25 +80,20 @@ function PlaylistScreen(props: any) {
       permissionAlert();
     }
 
-    return files.filter((file) => file.filename.endsWith('.mp3'));
+    return filterFiles(files);
   };
 
-  const permissionAlert = () => {
-    Alert.alert('Permission required', 'Application needs to read audio files', [
-      {
-        text: 'Allow',
-        onPress: () => getPermission(),
-      }, {
-        text: 'Deny',
-        onPress: () => permissionAlert(),
-      },
-    ]);
-  };
+  const filterFiles = (files: Asset[]) => files.filter((file) => {
+    const mp3 = file.filename.endsWith('.mp3');
+    const duration = file.duration > 10;
+    return mp3 && duration;
+  });
 
   useEffect(() => {
     getPermission().then((files) => {
-      setAudioFiles(files);
-      setFilteredAudioFiles(files);
+      setAudioFiles(filterFiles(files));
+      props.updatePlaylist(filterFiles(files));
+      setFilteredAudioFiles(filterFiles(files));
     });
   }, []);
 
@@ -97,6 +107,7 @@ function PlaylistScreen(props: any) {
         {filteredAudioFiles.map((audio: Asset, i: number) => (
           <AudioComponent
             key={i}
+            index={i}
             audio={audio}
             navigate={navigate}
           />
@@ -106,4 +117,8 @@ function PlaylistScreen(props: any) {
   );
 }
 
-export default connect()(PlaylistScreen);
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, any>) => ({
+  updatePlaylist: (playlist: Asset[] | null) => dispatch(setPlaylist(playlist)),
+});
+
+export default connect(null, mapDispatchToProps)(PlaylistScreen);
