@@ -126,12 +126,12 @@ function PlayerScreen(props: any) {
       }
     } else {
       if (playbackStatus.isPlaying) {
-        const position = playbackStatus.positionMillis ?? 0;
-        setTimeElapsed(position);
         setIsPlaying(true);
       } else {
         setIsPlaying(false);
       }
+      setTimeElapsed(playbackStatus.positionMillis ?? timeElapsed);
+
 
       if (playbackStatus.isBuffering) {
         // Update your UI for the buffering state
@@ -202,7 +202,9 @@ function PlayerScreen(props: any) {
     const audioDuration = props.audio.duration * 1000;
     const newTimeElapsed = newPercentage * audioDuration;
 
-    await soundInstance?.current?.setPositionAsync(newTimeElapsed);
+    const status: AVPlaybackStatus = await getStatus();
+    if (status.isLoaded && status.durationMillis)
+      await soundInstance?.current?.setPositionAsync(newTimeElapsed);
   };
 
   return (
