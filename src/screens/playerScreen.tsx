@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Image, SafeAreaView, StyleSheet, TouchableOpacity,
 } from 'react-native';
@@ -80,15 +80,16 @@ const styles = StyleSheet.create({
 });
 
 function PlayerScreen(props: any) {
+  const soundInstance = useRef<Sound>(new Audio.Sound());
+
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [playbackInstance, setPlaybackInstance] = useState<Sound | null>(null);
   const [volume] = useState<number>(1.0);
-  const [audioLoaded, setAudioLoaded] = useState<boolean>(false);
+  const [audioInit, setAudioInit] = useState<boolean>(false);
 
   const getStatus = async () => {
-    const status = await playbackInstance?.getStatusAsync();
+    const status = await soundInstance?.current?.getStatusAsync();
     return status;
   };
 
@@ -127,6 +128,7 @@ function PlayerScreen(props: any) {
       if (playbackStatus.isPlaying) {
         const position = playbackStatus.positionMillis ?? 0;
         setTimeElapsed(position);
+        setIsPlaying(true);
       } else {
         setIsPlaying(false);
       }
@@ -143,8 +145,7 @@ function PlayerScreen(props: any) {
 
   const loadAudio = async () => {
     try {
-      await playbackInstance?.unloadAsync();
-      const newPlaybackInstance = new Audio.Sound();
+      await soundInstance?.current?.unloadAsync();
 
       // TODO: fix error for '85%' audio file not playing
       const source = {
@@ -156,10 +157,8 @@ function PlayerScreen(props: any) {
         volume,
       };
 
-      newPlaybackInstance.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
-      await newPlaybackInstance.loadAsync(source, status, false);
-      setPlaybackInstance(newPlaybackInstance);
-      setIsPlaying(true);
+      soundInstance?.current?.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+      await soundInstance?.current?.loadAsync(source, status, false);
     } catch (e) {
       console.log(e);
     }
@@ -175,15 +174,15 @@ function PlayerScreen(props: any) {
       staysActiveInBackground: true,
       playThroughEarpieceAndroid: true,
     });
-    setAudioLoaded(true);
     await loadAudio();
   };
 
   useEffect(() => {
     if (props.index > -1) {
       setDuration(props.audio.duration * 1000);
-      if (!audioLoaded) {
+      if (!audioInit) {
         initAudio();
+        setAudioInit(true);
       } else {
         loadAudio();
       }
@@ -191,18 +190,19 @@ function PlayerScreen(props: any) {
   }, [props.index]);
 
   const handlePlayPause = async () => {
-    isPlaying ? await playbackInstance?.pauseAsync() : await playbackInstance?.playAsync();
+    if (isPlaying) {
+      await soundInstance?.current?.pauseAsync();
+    } else {
+      await soundInstance?.current?.playAsync();
+    }
     setIsPlaying(!isPlaying);
   };
 
-  // TODO: find out why playbackinstance is null
   const updateTimeElapsed = async (newPercentage: number) => {
     const audioDuration = props.audio.duration * 1000;
     const newTimeElapsed = newPercentage * audioDuration;
-    console.log(playbackInstance);
-    console.log(await getStatus());
 
-    await playbackInstance?.setPositionAsync(newTimeElapsed);
+    await soundInstance?.current?.setPositionAsync(newTimeElapsed);
   };
 
   return (
