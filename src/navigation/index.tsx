@@ -19,8 +19,8 @@ import {
   RootStackParamList, RootTabParamList, RootTabScreenProps,
 } from '../../types';
 import LinkingConfiguration from './LinkingConfiguration';
-import PlayerScreen from '../screens/playerScreen';
-import PlaylistScreen from '../screens/playlistScreen';
+import AudioPlayerScreen from '../screens/AudioPlayerScreen';
+import AudioPlaylistScreen from '../screens/AudioPlaylistScreen';
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
@@ -50,7 +50,7 @@ function BottomTabNavigator() {
     >
       <BottomTab.Screen
         name="Playlist"
-        component={PlaylistScreen}
+        component={AudioPlaylistScreen}
         options={({ navigation }: RootTabScreenProps<'Playlist'>) => ({
           title: 'Playlist',
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
@@ -58,7 +58,7 @@ function BottomTabNavigator() {
       />
       <BottomTab.Screen
         name="Player"
-        component={PlayerScreen}
+        component={AudioPlayerScreen}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="musical-notes" color={color} />,
         }}

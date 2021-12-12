@@ -8,11 +8,14 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Slider } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
-
 import { Asset } from 'expo-media-library';
+
 import { setCurrentPlayingAudio } from '../store/audio/action';
 import { Text, View } from '../components/Themed';
-import PlayButtonComponent from '../components/playButton';
+import ControlComponent from '../components/Control';
+import SeekbarComponent from '../components/Seekbar';
+import TrackDetailsComponent from '../components/TrackDetails';
+import AudioArtComponent from '../components/AudioArt';
 import { rootState } from '../models/reduxState';
 import { getAssetTitle, getDurationAsString } from '../utils/functions';
 import { AVPlaybackStatus } from '../models/audioStatus';
@@ -20,66 +23,19 @@ import { AVPlaybackStatus } from '../models/audioStatus';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EAEAEC',
+    backgroundColor: '#FFFFFF',
   },
-  textLight: {
-    color: '#B6B7BF',
-  },
-  text: {
-    color: '#8E97A6',
-  },
-  titleContainer: {
-    alignItems: 'center', marginTop: 24,
-  },
-  textDark: {
-    color: '#3D425C',
-  },
-  buttonContainer: {
+  control: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 0,
   },
-  coverContainer: {
-    marginTop: 32,
-    width: 250,
-    height: 250,
-    shadowColor: '#5D3F6A',
-    // shadowOffset: { height: 15 },
-    shadowRadius: 8,
-    shadowOpacity: 0.3,
-  },
-  cover: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-  },
-  track: {
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: '#FFF',
-  },
-  thumb: {
-    width: 8,
-    height: 8,
-    backgroundColor: '#3D425C',
-  },
-  timeStamp: {
-    fontSize: 11,
-    fontWeight: '500',
-  },
+
   seekbar: { margin: 32 },
-  inProgress: {
-    marginTop: -12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  trackName: {
-    alignItems: 'center', marginTop: 32,
-  },
 });
 
-function PlayerScreen(props: any) {
+function AudioPlayerScreen(props: any) {
   const soundInstance = useRef<Sound>(new Audio.Sound());
 
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
@@ -209,54 +165,23 @@ function PlayerScreen(props: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ alignItems: 'center' }}>
-        <View style={styles.titleContainer}>
-          <Text style={[styles.textLight, { fontSize: 12 }]}>PLAYLIST</Text>
-          <Text style={styles.text}>Instaplayer</Text>
-        </View>
-        <View style={styles.coverContainer}>
-          <Image
-            source={{ uri: 'http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg' }}
-            style={styles.cover}
-          />
-        </View>
-        <View style={styles.trackName}>
-          <Text style={[styles.textDark, {
-            fontSize: 20, fontWeight: '500',
-          }]}
-          >
-            {getAssetTitle(props.audio)}
-          </Text>
-        </View>
-      </View>
+      <AudioArtComponent url={'http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg'} />
+
+      <TrackDetailsComponent audio={props.audio} />
+
       <View style={styles.seekbar}>
-        <Slider
-          minimumValue={0}
-          maximumValue={duration}
-          trackStyle={styles.track}
-          thumbStyle={styles.thumb}
-          value={timeElapsed}
-          minimumTrackTintColor="#93A8B3"
-          onValueChange={updateTimeElapsed}
+        <SeekbarComponent onValueChange={updateTimeElapsed}
+                          value={timeElapsed}
+                          duration={duration}
         />
-        <View style={styles.inProgress}>
-          <Text style={[styles.textLight, styles.timeStamp]}>
-            {getDurationAsString(timeElapsed)}
-          </Text>
-          <Text style={[styles.textLight, styles.timeStamp]}>
-            {getDurationAsString(duration)}
-          </Text>
-        </View>
       </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handlePreviousTrack}>
-          <FontAwesome name="arrow-left" size={32} color="#93A8B3" />
-        </TouchableOpacity>
-        <PlayButtonComponent onPress={() => handlePlayPause()} state={isPlaying ? 'pause' : 'play'} />
-        <TouchableOpacity onPress={handleNextTrack}>
-          <FontAwesome name="arrow-right" size={32} color="#93A8B3" />
-        </TouchableOpacity>
+      <View style={styles.control}>
+        <ControlComponent handlePreviousTrack={handlePreviousTrack}
+                          handleNextTrack={handleNextTrack}
+                          handlePlayPause={handlePlayPause}
+                          isPlaying={isPlaying}
+        />
       </View>
     </SafeAreaView>
   );
@@ -273,4 +198,4 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, any>) => ({
   changeSong: (audio: Asset | null, index: number) => dispatch(setCurrentPlayingAudio(audio, index)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(PlayerScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(AudioPlayerScreen);
