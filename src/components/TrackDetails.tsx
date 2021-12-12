@@ -51,12 +51,12 @@ const styles = StyleSheet.create({
   }
 });
 
-function TrackDetailsComponent(props: any) {
+function TrackDetailsComponent({audio}: any) {
   return (
     <View style={styles.container}>
       <View style={styles.detailsWrapper}>
         <Text style={styles.title}>
-          {getAssetTitle(props.audio)}
+          {getAssetTitle(audio)}
         </Text>
       </View>
     </View>

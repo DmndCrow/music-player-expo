@@ -10,12 +10,13 @@ import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { Asset } from 'expo-media-library';
 
-import { setCurrentPlayingAudio } from '../store/audio/action';
-import { Text, View } from '../components/Themed';
 import ControlComponent from '../components/Control';
 import SeekbarComponent from '../components/Seekbar';
 import TrackDetailsComponent from '../components/TrackDetails';
 import AudioArtComponent from '../components/AudioArt';
+
+import { setCurrentPlayingAudio } from '../store/audio/action';
+import { Text, View } from '../components/Themed';
 import { rootState } from '../models/reduxState';
 import { getAssetTitle, getDurationAsString } from '../utils/functions';
 import { AVPlaybackStatus } from '../models/audioStatus';
@@ -43,6 +44,8 @@ function AudioPlayerScreen(props: any) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [volume] = useState<number>(1.0);
   const [audioInit, setAudioInit] = useState<boolean>(false);
+  const [isShuffling] = useState<boolean>(false);
+  const [isRepeating] = useState<boolean>(false);
 
   const getStatus = async () => {
     const status = await soundInstance?.current?.getStatusAsync();
@@ -75,10 +78,8 @@ function AudioPlayerScreen(props: any) {
 
   const onPlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
     if (!playbackStatus.isLoaded) {
-      // Update your UI for the unloaded state
       if (playbackStatus.error) {
         console.log(`Encountered a fatal error during playback: ${playbackStatus.error}`);
-        // Send Expo team the error on Slack or the forums so we can help you debug!
       }
     } else {
       if (playbackStatus.isPlaying) {
@@ -87,11 +88,6 @@ function AudioPlayerScreen(props: any) {
         setIsPlaying(false);
       }
       setTimeElapsed(playbackStatus.positionMillis ?? timeElapsed);
-
-
-      if (playbackStatus.isBuffering) {
-        // Update your UI for the buffering state
-      }
 
       if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
         handleNextTrack();
@@ -159,8 +155,9 @@ function AudioPlayerScreen(props: any) {
     const newTimeElapsed = newPercentage * audioDuration;
 
     const status: AVPlaybackStatus = await getStatus();
-    if (status.isLoaded && status.durationMillis)
+    if (status.isLoaded && status.durationMillis) {
       await soundInstance?.current?.setPositionAsync(newTimeElapsed);
+    }
   };
 
   return (
@@ -181,6 +178,8 @@ function AudioPlayerScreen(props: any) {
                           handleNextTrack={handleNextTrack}
                           handlePlayPause={handlePlayPause}
                           isPlaying={isPlaying}
+                          isShuffling={isShuffling}
+                          isRepeating={isRepeating}
         />
       </View>
     </SafeAreaView>
