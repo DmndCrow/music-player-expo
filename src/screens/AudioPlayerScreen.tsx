@@ -42,8 +42,8 @@ function AudioPlayerScreen(props: any) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [volume] = useState<number>(1.0);
   const [audioInit, setAudioInit] = useState<boolean>(false);
-  const [isShuffling] = useState<boolean>(false);
-  const [isRepeating] = useState<boolean>(false);
+  const [isShuffling, setIsShuffling] = useState<boolean>(false);
+  const [isRepeating, setIsRepeating] = useState<boolean>(false);
 
   const getStatus = async () => {
     const status = await soundInstance?.current?.getStatusAsync();
@@ -56,23 +56,35 @@ function AudioPlayerScreen(props: any) {
 
   const handlePreviousTrack = async () => {
     let newIndex = props.index;
-    if (props.index === 0) {
-      newIndex = props.playlist.length - 1;
-    } else if (props.index > 0) {
-      newIndex -= 1;
+    if (isShuffling) {
+
+    } else {
+      if (props.index === 0) {
+        newIndex = props.playlist.length - 1;
+      } else if (props.index > 0) {
+        newIndex -= 1;
+      }
     }
     await playNewAudio(newIndex);
   };
 
   const handleNextTrack = async () => {
     let newIndex = props.index;
-    if (props.index === props.playlist.length - 1) {
-      newIndex = 0;
-    } else if (props.index >= 0) {
-      newIndex += 1;
+    if (isShuffling) {
+
+    } else {
+      if (props.index === props.playlist.length - 1) {
+        newIndex = 0;
+      } else if (props.index >= 0) {
+        newIndex += 1;
+      }
     }
     await playNewAudio(newIndex);
   };
+
+  const repeatTrack = async () => {
+
+  }
 
   const onPlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
     if (!playbackStatus.isLoaded) {
@@ -89,6 +101,8 @@ function AudioPlayerScreen(props: any) {
 
       if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
         handleNextTrack();
+      } else if (playbackStatus.didJustFinish && playbackStatus.isLooping) {
+        handleRepeatTrack();
       }
     }
   };
@@ -148,6 +162,16 @@ function AudioPlayerScreen(props: any) {
     setIsPlaying(!isPlaying);
   };
 
+  const handleRepeatTrackUpdate = async () => {
+    await soundInstance?.current?.setIsLoopingAsync(!isRepeating);
+    setIsRepeating(!isRepeating);
+  }
+
+  const handleRepeatTrack = async () => {
+    setTimeElapsed(0);
+    await soundInstance?.current?.setPositionAsync(0);
+  }
+
   const updateTimeElapsed = async (newPercentage: number) => {
     const audioDuration = props.audio.duration * 1000;
     const newTimeElapsed = newPercentage * audioDuration;
@@ -177,6 +201,8 @@ function AudioPlayerScreen(props: any) {
           handlePreviousTrack={handlePreviousTrack}
           handleNextTrack={handleNextTrack}
           handlePlayPause={handlePlayPause}
+          setIsShuffling={setIsShuffling}
+          handleRepeatTrack={handleRepeatTrackUpdate}
           isPlaying={isPlaying}
           isShuffling={isShuffling}
           isRepeating={isRepeating}
