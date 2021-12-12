@@ -1,11 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import {
+  View, Image, StyleSheet, Dimensions, TouchableOpacity,
+} from 'react-native';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { rootState } from '../models/reduxState';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const imageSize = width - 100;
 
 const styles = StyleSheet.create({
@@ -19,7 +21,7 @@ const styles = StyleSheet.create({
     width: imageSize,
     height: imageSize,
   },
-})
+});
 
 function AudioArtComponent(props: any) {
   return (
@@ -27,12 +29,13 @@ function AudioArtComponent(props: any) {
       <TouchableOpacity>
         <View
           style={[styles.image, {
-            elevation: 10, shadowColor: '#d9d9d9',
+            elevation: 10,
+            shadowColor: '#d9d9d9',
             shadowOffset: { width: 0, height: 0 },
             shadowOpacity: 1,
             shadowRadius: 2,
             borderRadius: 20,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#ffffff',
           }]}
         >
           <Image
@@ -42,7 +45,7 @@ function AudioArtComponent(props: any) {
         </View>
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => ({

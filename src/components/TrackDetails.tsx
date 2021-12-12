@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View, Text, StyleSheet,
+} from 'react-native';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 
@@ -48,10 +50,10 @@ const styles = StyleSheet.create({
   moreButtonIcon: {
     height: 17,
     width: 17,
-  }
+  },
 });
 
-function TrackDetailsComponent({audio}: any) {
+function TrackDetailsComponent({ audio }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.detailsWrapper}>
@@ -60,7 +62,7 @@ function TrackDetailsComponent({audio}: any) {
         </Text>
       </View>
     </View>
-  )
+  );
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => ({

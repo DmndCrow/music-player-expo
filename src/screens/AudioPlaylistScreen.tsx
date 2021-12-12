@@ -1,5 +1,5 @@
-import React, { useState, useEffect, } from 'react';
-import { Alert, ScrollView, } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert, ScrollView } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { Asset } from 'expo-media-library';
 import { connect } from 'react-redux';

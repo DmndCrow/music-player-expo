@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes, { InferProps } from 'prop-types';
 import { FontAwesome } from '@expo/vector-icons';
-import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
+import { Badge } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View, StyleSheet, TouchableOpacity,
+} from 'react-native';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 
@@ -36,48 +38,52 @@ const styles = StyleSheet.create({
   shuffleBadge: {
     position: 'absolute',
     top: -8,
-    right: 9
+    right: 9,
   },
   repeatBadge: {
     position: 'absolute',
     top: -8,
-    right: 6
-  }
-})
+    right: 6,
+  },
+});
 
 function ControlComponent({
   handlePreviousTrack, handleNextTrack, handlePlayPause,
-  isPlaying, isShuffling, isRepeating
+  isPlaying, isShuffling, isRepeating,
 }: InferProps<typeof ControlComponent.propTypes>) {
   return (
     <View style={styles.container}>
       <TouchableOpacity activeOpacity={0.0} onPress={() => console.log('shuffle')}>
-        <FontAwesome name='random' color={Colors.darkColor} size={24} />
-        <Badge status={isShuffling ? 'success' : 'error'}
-               containerStyle={styles.shuffleBadge} />
+        <FontAwesome name="random" color={Colors.darkColor} size={24} />
+        <Badge
+          status={isShuffling ? 'success' : 'error'}
+          containerStyle={styles.shuffleBadge}
+        />
       </TouchableOpacity>
       <View style={{ width: 40 }} />
       <TouchableOpacity onPress={handlePreviousTrack}>
-        <FontAwesome name='arrow-left' color={Colors.darkColor} size={24} />
+        <FontAwesome name="arrow-left" color={Colors.darkColor} size={24} />
       </TouchableOpacity>
       <View style={{ width: 20 }} />
-        <TouchableOpacity onPress={handlePlayPause}>
-          <View style={styles.playButton}>
-            <FontAwesome name={isPlaying ? 'pause' : 'play'} color={Colors.darkColor} size={24} />
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={handlePlayPause}>
+        <View style={styles.playButton}>
+          <FontAwesome name={isPlaying ? 'pause' : 'play'} color={Colors.darkColor} size={24} />
+        </View>
+      </TouchableOpacity>
       <View style={{ width: 20 }} />
       <TouchableOpacity onPress={handleNextTrack}>
-        <FontAwesome name='arrow-right' color={Colors.darkColor} size={24} />
+        <FontAwesome name="arrow-right" color={Colors.darkColor} size={24} />
       </TouchableOpacity>
       <View style={{ width: 40 }} />
       <TouchableOpacity activeOpacity={0.0} onPress={() => console.log('repeat')}>
-        <FontAwesome name='repeat' color={Colors.darkColor} size={24} />
-        <Badge status={isRepeating ? 'success' : 'error'}
-               containerStyle={styles.repeatBadge} />
+        <FontAwesome name="repeat" color={Colors.darkColor} size={24} />
+        <Badge
+          status={isRepeating ? 'success' : 'error'}
+          containerStyle={styles.repeatBadge}
+        />
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 ControlComponent.propTypes = {
@@ -86,8 +92,8 @@ ControlComponent.propTypes = {
   handlePlayPause: PropTypes.func.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   isShuffling: PropTypes.bool.isRequired,
-  isRepeating: PropTypes.bool.isRequired
-}
+  isRepeating: PropTypes.bool.isRequired,
+};
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => ({
 });

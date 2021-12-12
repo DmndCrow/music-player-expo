@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes, { InferProps } from 'prop-types';
 import { connect } from 'react-redux';
-import { StyleSheet, View, Text } from 'react-native';
+import {
+  StyleSheet, View, Text,
+} from 'react-native';
 import { Slider } from 'react-native-elements';
-import Colors from '../utils/constants/Colors';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import Colors from '../utils/constants/Colors';
 
 import { rootState } from '../models/reduxState';
 import { getDurationAsString } from '../utils/functions';
@@ -33,11 +35,11 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.72)',
     fontSize: 12,
     textAlign: 'center',
-  }
+  },
 });
 
 function SeekbarComponent({
-  onValueChange, value, duration
+  onValueChange, value, duration,
 }: InferProps<typeof SeekbarComponent.propTypes>) {
   return (
     <View style={styles.container}>
@@ -61,14 +63,14 @@ function SeekbarComponent({
         onValueChange={onValueChange}
       />
     </View>
-  )
+  );
 }
 
 SeekbarComponent.propTypes = {
   onValueChange: PropTypes.func.isRequired,
   value: PropTypes.number.isRequired,
-  duration: PropTypes.number.isRequired
-}
+  duration: PropTypes.number.isRequired,
+};
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, never, AnyAction>) => ({
 });

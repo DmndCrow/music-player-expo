@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useEffect, useState, useRef,
+} from 'react';
 import {
-  Image, SafeAreaView, StyleSheet, TouchableOpacity,
+  SafeAreaView, StyleSheet, View,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio/Sound';
-import { FontAwesome } from '@expo/vector-icons';
-import { Slider } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { Asset } from 'expo-media-library';
@@ -16,9 +16,7 @@ import TrackDetailsComponent from '../components/TrackDetails';
 import AudioArtComponent from '../components/AudioArt';
 
 import { setCurrentPlayingAudio } from '../store/audio/action';
-import { Text, View } from '../components/Themed';
 import { rootState } from '../models/reduxState';
-import { getAssetTitle, getDurationAsString } from '../utils/functions';
 import { AVPlaybackStatus } from '../models/audioStatus';
 
 const styles = StyleSheet.create({
@@ -162,24 +160,26 @@ function AudioPlayerScreen(props: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AudioArtComponent url={'http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg'} />
+      <AudioArtComponent url="http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg" />
 
       <TrackDetailsComponent audio={props.audio} />
 
       <View style={styles.seekbar}>
-        <SeekbarComponent onValueChange={updateTimeElapsed}
-                          value={timeElapsed}
-                          duration={duration}
+        <SeekbarComponent
+          onValueChange={updateTimeElapsed}
+          value={timeElapsed}
+          duration={duration}
         />
       </View>
 
       <View style={styles.control}>
-        <ControlComponent handlePreviousTrack={handlePreviousTrack}
-                          handleNextTrack={handleNextTrack}
-                          handlePlayPause={handlePlayPause}
-                          isPlaying={isPlaying}
-                          isShuffling={isShuffling}
-                          isRepeating={isRepeating}
+        <ControlComponent
+          handlePreviousTrack={handlePreviousTrack}
+          handleNextTrack={handleNextTrack}
+          handlePlayPause={handlePlayPause}
+          isPlaying={isPlaying}
+          isShuffling={isShuffling}
+          isRepeating={isRepeating}
         />
       </View>
     </SafeAreaView>
