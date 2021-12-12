@@ -54,8 +54,8 @@ function SeekbarComponent({
       </View>
       <Slider
         minimumValue={0}
-        maximumValue={Math.max(duration, 1)}
-        value={value}
+        maximumValue={1}
+        value={value / Math.max(1, duration)}
         minimumTrackTintColor={Colors.darkColor}
         maximumTrackTintColor={Colors.lightGrayColor}
         trackStyle={styles.track}
