@@ -49,11 +49,12 @@ const styles = StyleSheet.create({
 
 function ControlComponent({
   handlePreviousTrack, handleNextTrack, handlePlayPause,
+  handleShuffle, handleRepeatTrack,
   isPlaying, isShuffling, isRepeating,
 }: InferProps<typeof ControlComponent.propTypes>) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity activeOpacity={0.0} onPress={() => console.log('shuffle')}>
+      <TouchableOpacity activeOpacity={0.0} onPress={handleShuffle}>
         <FontAwesome name="random" color={Colors.darkColor} size={24} />
         <Badge
           status={isShuffling ? 'success' : 'error'}
@@ -75,7 +76,7 @@ function ControlComponent({
         <FontAwesome name="arrow-right" color={Colors.darkColor} size={24} />
       </TouchableOpacity>
       <View style={{ width: 40 }} />
-      <TouchableOpacity activeOpacity={0.0} onPress={() => console.log('repeat')}>
+      <TouchableOpacity activeOpacity={0.0} onPress={handleRepeatTrack}>
         <FontAwesome name="repeat" color={Colors.darkColor} size={24} />
         <Badge
           status={isRepeating ? 'success' : 'error'}
@@ -90,6 +91,8 @@ ControlComponent.propTypes = {
   handlePreviousTrack: PropTypes.func.isRequired,
   handleNextTrack: PropTypes.func.isRequired,
   handlePlayPause: PropTypes.func.isRequired,
+  handleShuffle: PropTypes.func.isRequired,
+  handleRepeatTrack: PropTypes.func.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   isShuffling: PropTypes.bool.isRequired,
   isRepeating: PropTypes.bool.isRequired,
