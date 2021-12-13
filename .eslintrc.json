@@ -20,7 +20,7 @@
     "quote-props": ["error", "as-needed"], // object key initialization is not required to use quotes
     "comma-dangle": "error", // no trailing comma
     "comma-spacing": "error", // space after comma between elements is required
-    "indent": ["error", 2], // indent is required to be 2
+    "indent": [2, 2, { "SwitchCase": 1}], // indent is required to be 2
     "spaced-comment": "error", // whitespace at the beginning of comment is required
     "no-plusplus": "error", // no i++, only i += 1
     "react/jsx-uses-react": "error",

@@ -11,16 +11,16 @@ const initialState: playlistState = {
 
 const playlistReducer = (state: playlistState = initialState, action: AnyAction) => {
   switch (action.type) {
-  case SET_PLAYLIST: {
-    return {
-      ...state,
-      playlist: action.payload,
-    };
-  }
+    case SET_PLAYLIST: {
+      return {
+        ...state,
+        playlist: action.payload,
+      };
+    }
 
-  default: {
-    return state;
-  }
+    default: {
+      return state;
+    }
   }
 };
 

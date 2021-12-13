@@ -12,17 +12,17 @@ const initialState: audioState = {
 
 const audioReducer = (state: audioState = initialState, action: AnyAction) => {
   switch (action.type) {
-  case SET_CURRENT_PLAYING_AUDIO: {
-    return {
-      ...state,
-      audio: action.payload.audio,
-      index: action.payload.index,
-    };
-  }
+    case SET_CURRENT_PLAYING_AUDIO: {
+      return {
+        ...state,
+        audio: action.payload.audio,
+        index: action.payload.index,
+      };
+    }
 
-  default: {
-    return state;
-  }
+    default: {
+      return state;
+    }
   }
 };
 

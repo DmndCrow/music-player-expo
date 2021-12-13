@@ -49,12 +49,12 @@ const styles = StyleSheet.create({
 
 function ControlComponent({
   handlePreviousTrack, handleNextTrack, handlePlayPause,
-  setIsShuffling, handleRepeatTrack,
+  handleShuffle, handleRepeatTrack,
   isPlaying, isShuffling, isRepeating,
 }: InferProps<typeof ControlComponent.propTypes>) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity activeOpacity={0.0} onPress={() => setIsShuffling(!isShuffling)}>
+      <TouchableOpacity activeOpacity={0.0} onPress={handleShuffle}>
         <FontAwesome name="random" color={Colors.darkColor} size={24} />
         <Badge
           status={isShuffling ? 'success' : 'error'}
@@ -91,7 +91,7 @@ ControlComponent.propTypes = {
   handlePreviousTrack: PropTypes.func.isRequired,
   handleNextTrack: PropTypes.func.isRequired,
   handlePlayPause: PropTypes.func.isRequired,
-  setIsShuffling: PropTypes.func.isRequired,
+  handleShuffle: PropTypes.func.isRequired,
   handleRepeatTrack: PropTypes.func.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   isShuffling: PropTypes.bool.isRequired,
